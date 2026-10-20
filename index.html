@@ -1,0 +1,1423 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rickra1n Tech | Wi-Fi Control Center</title>
+
+<style>
+:root {
+  --bg: #070910;
+  --panel: #101522;
+  --panel2: #151c2b;
+  --green: #00f5a0;
+  --cyan: #00d9ff;
+  --red: #ff5470;
+  --yellow: #ffd166;
+  --text: #f4f7ff;
+  --muted: #8994aa;
+  --border: rgba(255,255,255,.09);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(ellipse at 10% 0%, #102b35 0%, transparent 35%),
+    radial-gradient(ellipse at 100% 30%, #171335 0%, transparent 35%),
+    var(--bg);
+  color: var(--text);
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  min-height: 100vh;
+}
+
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+
+button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 245px minmax(0,1fr);
+  min-height: 100vh;
+}
+
+.sidebar {
+  padding: 25px 17px;
+  border-right: 1px solid var(--border);
+  background: rgba(7,9,16,.9);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 7px 30px;
+}
+
+.logo {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  color: #00140c;
+  font-size: 23px;
+  font-weight: 900;
+  border-radius: 14px;
+  background: linear-gradient(135deg,var(--green),var(--cyan));
+  box-shadow: 0 0 30px #00f5a033;
+}
+
+.brand h2 { font-size: 16px; margin: 0; letter-spacing: 1px; }
+.brand small { color: var(--green); font-size: 10px; letter-spacing: 2px; }
+
+.nav-label {
+  color: #667187;
+  font-size: 10px;
+  letter-spacing: 2px;
+  padding: 18px 12px 10px;
+}
+
+.nav-btn {
+  width: 100%;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 13px 14px;
+  margin-bottom: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #9ca8bc;
+  border-radius: 12px;
+  text-align: left;
+  transition: .25s;
+}
+
+.nav-btn:hover, .nav-btn.active {
+  color: var(--green);
+  background: #00f5a010;
+  border-color: #00f5a025;
+  transform: translateX(3px);
+}
+
+.sidebar-bottom {
+  position: absolute;
+  bottom: 22px;
+  left: 17px;
+  right: 17px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--panel);
+}
+
+.online-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--green);
+  margin-right: 7px;
+}
+
+main { min-width: 0; padding: 28px; }
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 26px;
+}
+
+.topbar h1 { margin: 0; font-size: clamp(22px,3vw,31px); }
+.topbar p { color: var(--muted); font-size: 13px; margin: 7px 0 0; }
+
+.top-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.btn {
+  border: 1px solid var(--border);
+  background: var(--panel2);
+  color: var(--text);
+  padding: 11px 15px;
+  border-radius: 10px;
+  transition: .2s;
+}
+
+.btn:hover { transform: translateY(-2px); border-color: #00f5a066; }
+.btn-primary {
+  background: linear-gradient(110deg,var(--green),#00d8b4);
+  color: #03150e;
+  font-weight: 800;
+  border: 0;
+  box-shadow: 0 5px 22px #00f5a020;
+}
+
+.btn-danger { color: #ff8394; border-color: #ff547033; }
+.btn-small { padding: 7px 10px; font-size: 12px; }
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 27px;
+  border-radius: 20px;
+  border: 1px solid #00f5a026;
+  background: linear-gradient(115deg,#102a2a,#111927 55%,#18152b);
+  margin-bottom: 23px;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  right: -70px;
+  top: -150px;
+  border-radius: 50%;
+  background: var(--green);
+  filter: blur(95px);
+  opacity: .15;
+  animation: glow 5s infinite alternate;
+}
+
+@keyframes glow { to { transform: translate(-60px,100px); opacity:.3; } }
+
+.hero-content {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.eyebrow {
+  color: var(--green);
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-weight: 800;
+}
+
+.hero h2 { font-size: clamp(23px,3vw,35px); margin: 12px 0; }
+.hero p { color: #a7b4c7; font-size: 13px; line-height: 1.7; max-width: 520px; }
+
+.hero-clock {
+  font-size: clamp(25px,4vw,43px);
+  font-weight: 800;
+  color: var(--green);
+  text-shadow: 0 0 25px #00f5a033;
+  white-space: nowrap;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.stat {
+  border: 1px solid var(--border);
+  background: linear-gradient(145deg,#121827,#0e121d);
+  padding: 19px;
+  border-radius: 16px;
+  min-width: 0;
+  transition: .25s;
+  animation: appear .5s both;
+}
+
+.stat:hover { transform: translateY(-4px); border-color: #00f5a055; }
+
+.stat-head { display: flex; justify-content: space-between; align-items: center; }
+.stat-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: #00f5a015;
+  font-size: 19px;
+}
+
+.stat-label { color: var(--muted); font-size: 12px; }
+.stat-value { font-size: clamp(23px,3vw,31px); font-weight: 800; margin-top: 15px; overflow-wrap: anywhere; }
+.stat-note { color: #718096; font-size: 11px; margin-top: 7px; }
+
+@keyframes appear {
+  from { opacity:0; transform:translateY(12px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.panel {
+  background: rgba(15,20,32,.94);
+  border: 1px solid var(--border);
+  border-radius: 17px;
+  padding: 21px;
+  margin-bottom: 22px;
+  min-width: 0;
+}
+
+.panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.panel-heading h2 { margin: 0; font-size: 17px; }
+.panel-heading p { margin: 6px 0 0; color: var(--muted); font-size: 12px; }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 15px;
+}
+
+.field { display: flex; flex-direction: column; gap: 7px; }
+.field label { color: #aab5c8; font-size: 12px; }
+.field input, .field select, .field textarea,
+.search-input {
+  width: 100%;
+  color: var(--text);
+  background: #090e18;
+  border: 1px solid #273044;
+  border-radius: 10px;
+  padding: 12px;
+  min-width: 0;
+  transition: .2s;
+}
+
+.field input:focus, .field select:focus, .field textarea:focus,
+.search-input:focus { border-color: var(--green); outline: none; }
+
+.field select option { background: #101522; }
+.form-actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+.hidden { display: none !important; }
+
+.toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+.toolbar .search-input { flex: 1 1 200px; }
+.toolbar select { max-width: 190px; }
+
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 850px; }
+th {
+  color: #7f8ba1;
+  text-align: left;
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 13px 11px;
+  border-bottom: 1px solid var(--border);
+}
+td {
+  padding: 15px 11px;
+  border-bottom: 1px solid #ffffff08;
+  font-size: 12px;
+  vertical-align: middle;
+}
+tbody tr { transition: .2s; }
+tbody tr:hover { background: #ffffff04; }
+.client-name { font-weight: 700; }
+.client-meta { color: var(--muted); font-size: 11px; margin-top: 5px; }
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 20px;
+  padding: 6px 9px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.status-active { background: #00f5a015; color: var(--green); }
+.status-paused { background: #ffd16615; color: var(--yellow); }
+.status-expired { background: #ff547015; color: #ff7b90; }
+.status-finished { background: #9aa5b115; color: #b6c0d0; }
+
+.timer {
+  font-size: 15px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.timer.warning { color: var(--yellow); }
+.timer.expired { color: var(--red); }
+.mini-progress { height: 4px; background: #293044; border-radius: 9px; margin-top: 7px; overflow: hidden; }
+.mini-progress span { display: block; height: 100%; background: var(--green); transition: width .5s; }
+
+.actions { display: flex; gap: 5px; flex-wrap: wrap; max-width: 220px; }
+.action {
+  border: 1px solid var(--border);
+  background: #171e2d;
+  color: #c7d0df;
+  border-radius: 7px;
+  padding: 7px 9px;
+  font-size: 11px;
+}
+.action:hover { color: var(--green); border-color: #00f5a055; }
+.action.delete:hover { color: var(--red); border-color: #ff547055; }
+
+.pill {
+  display: inline-block;
+  padding: 5px 8px;
+  border-radius: 7px;
+  font-size: 10px;
+  background: #ffffff08;
+  color: #bac5d7;
+}
+.paid { color: var(--green); background: #00f5a012; }
+.unpaid { color: var(--yellow); background: #ffd16612; }
+
+.empty { padding: 35px; text-align: center; color: var(--muted); }
+.empty div { font-size: 32px; margin-bottom: 10px; }
+
+.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+.metric-row { display: flex; justify-content: space-between; gap: 10px; padding: 13px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.metric-row:last-child { border-bottom: 0; }
+.metric-row span:first-child { color: var(--muted); }
+.metric-row strong { overflow-wrap: anywhere; }
+
+.alert-list { display: flex; flex-direction: column; gap: 10px; }
+.alert-item {
+  padding: 12px;
+  border-radius: 10px;
+  background: #ffffff04;
+  border: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+}
+.alert-item small { color: var(--muted); display: block; margin-top: 5px; }
+
+footer { text-align: center; color: #5f6b80; font-size: 11px; padding: 10px; }
+
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(360px,calc(100vw - 40px));
+}
+
+.toast {
+  background: #131c2a;
+  border: 1px solid #00f5a055;
+  box-shadow: 0 12px 40px #0008;
+  border-radius: 12px;
+  padding: 15px;
+  animation: appear .25s;
+  font-size: 13px;
+}
+.toast.error { border-color: #ff547077; }
+.toast.warning { border-color: #ffd16677; }
+
+dialog {
+  color: var(--text);
+  background: #111827;
+  border: 1px solid #344055;
+  border-radius: 18px;
+  padding: 25px;
+  width: min(420px,calc(100vw - 30px));
+  box-shadow: 0 30px 100px #000b;
+}
+dialog::backdrop { background: #02040bd9; backdrop-filter: blur(5px); }
+dialog h2 { margin-top: 0; }
+dialog p { color: #b3bfd0; font-size: 13px; line-height: 1.6; }
+
+.mobile-menu { display: none; }
+
+@media(max-width:1100px) {
+  .stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .form-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+
+@media(max-width:760px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar {
+    position: relative;
+    height: auto;
+    padding: 12px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .brand { padding: 5px; }
+  .nav-label, .sidebar-bottom { display: none; }
+  .nav-links { display: flex; overflow-x: auto; gap: 5px; padding-bottom: 3px; }
+  .nav-btn { width: auto; min-width: max-content; margin: 0; padding: 10px; }
+  main { padding: 16px; }
+  .topbar { align-items: flex-start; }
+  .topbar p { max-width: 240px; }
+  .hero { padding: 20px; }
+  .hero-content { align-items: flex-start; flex-direction: column; }
+  .hero-clock { font-size: 27px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .bottom-grid { grid-template-columns: 1fr; }
+  .panel { padding: 15px; }
+  .top-actions { justify-content: flex-end; }
+  .top-actions .btn { padding: 9px; font-size: 12px; }
+}
+
+@media(max-width:400px) {
+  .stats { gap: 9px; }
+  .stat { padding: 13px; }
+  .stat-value { font-size: 22px; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">R</div>
+      <div>
+        <h2>RICKRA1N TECH</h2>
+        <small>WI-FI CONTROL CENTER</small>
+      </div>
+    </div>
+
+    <div class="nav-label">MENU PRINCIPAL</div>
+    <nav class="nav-links">
+      <button class="nav-btn active" data-target="dashboard">◈ Dashboard</button>
+      <button class="nav-btn" data-target="add-section">＋ Nouveau client</button>
+      <button class="nav-btn" data-target="clients-section">▤ Clients & sessions</button>
+      <button class="nav-btn" data-target="finance-section">＄ Finances</button>
+      <button class="nav-btn" data-target="history-section">◷ Historique</button>
+      <button class="nav-btn" data-target="backup-section">⚙ Données & outils</button>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div style="font-size:12px;font-weight:700;margin-bottom:8px">
+        <span class="online-dot"></span>SYSTÈME LOCAL
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6">
+        Gestion des sessions dans ce navigateur.
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <header class="topbar" id="dashboard">
+      <div>
+        <h1>Centre de contrôle</h1>
+        <p>Surveille tes clients Wi-Fi et leurs sessions en un seul endroit.</p>
+      </div>
+      <div class="top-actions">
+        <button class="btn" id="sound-toggle">🔔 Son activé</button>
+        <button class="btn btn-primary" id="jump-add">＋ Ajouter client</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-content">
+        <div>
+          <div class="eyebrow">● RICKRA1N NETWORK MANAGEMENT</div>
+          <h2>Ton réseau. Ton contrôle.</h2>
+          <p>
+            Gère les accès, surveille les temps de connexion,
+            suis les paiements et reçois des alertes lorsque les sessions approchent de leur fin.
+          </p>
+        </div>
+        <div>
+          <div class="hero-clock" id="live-clock">00:00:00</div>
+          <div style="text-align:right;color:var(--muted);font-size:11px" id="live-date"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="stat">
+        <div class="stat-head"><span class="stat-label">Sessions actives</span><span class="stat-icon">◉</span></div>
+        <div class="stat-value" id="stat-active">0</div>
+        <div class="stat-note">Connexions en cours</div>
+      </div>
+      <div class="stat">
+        <div class="stat-head"><span class="stat-label">Temps restant total</span><span class="stat-icon">◷</span></div>
+        <div class="stat-value" id="stat-time">0 min</div>
+        <div class="stat-note">Pour les sessions actives</div>
+      </div>
+      <div class="stat">
+        <div class="stat-head"><span class="stat-label">Revenus encaissés</span><span class="stat-icon">＄</span></div>
+        <div class="stat-value" id="stat-revenue">0 HTG</div>
+        <div class="stat-note">Paiements marqués comme reçus</div>
+      </div>
+      <div class="stat">
+        <div class="stat-head"><span class="stat-label">Paiements en attente</span><span class="stat-icon">⌛</span></div>
+        <div class="stat-value" id="stat-unpaid">0 HTG</div>
+        <div class="stat-note">Montants non encore encaissés</div>
+      </div>
+    </section>
+
+    <section class="panel" id="add-section">
+      <div class="panel-heading">
+        <div>
+          <h2 id="form-title">＋ Ajouter un client</h2>
+          <p>Crée une session Wi-Fi avec sa durée et son tarif.</p>
+        </div>
+        <span class="pill">NOUVELLE SESSION</span>
+      </div>
+
+      <form id="client-form">
+        <div class="form-grid">
+          <div class="field">
+            <label for="client-name">Nom du client *</label>
+            <input id="client-name" required maxlength="80" placeholder="Ex. Jean Pierre">
+          </div>
+          <div class="field">
+            <label for="client-contact">Téléphone / identifiant</label>
+            <input id="client-contact" maxlength="80" placeholder="Ex. 37XX XXXX">
+          </div>
+          <div class="field">
+            <label for="client-duration">Durée *</label>
+            <select id="client-duration">
+              <option value="15">15 minutes</option>
+              <option value="30">30 minutes</option>
+              <option value="60" selected>1 heure</option>
+              <option value="120">2 heures</option>
+              <option value="180">3 heures</option>
+              <option value="360">6 heures</option>
+              <option value="720">12 heures</option>
+              <option value="1440">24 heures</option>
+              <option value="custom">Personnalisée</option>
+            </select>
+          </div>
+          <div class="field hidden" id="custom-duration-field">
+            <label for="custom-duration">Durée personnalisée (minutes) *</label>
+            <input id="custom-duration" type="number" min="1" max="525600" placeholder="Ex. 90">
+          </div>
+          <div class="field">
+            <label for="client-price">Prix (HTG)</label>
+            <input id="client-price" type="number" min="0" step="0.01" value="0" placeholder="Ex. 50">
+          </div>
+          <div class="field">
+            <label for="client-payment">État du paiement</label>
+            <select id="client-payment">
+              <option value="paid">Payé</option>
+              <option value="unpaid">Non payé</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="client-start">Démarrage de la session</label>
+            <select id="client-start">
+              <option value="now">Démarrer maintenant</option>
+              <option value="paused">Créer en pause</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="client-notes">Notes (facultatif)</label>
+            <input id="client-notes" maxlength="200" placeholder="Ex. Chambre 2, forfait spécial">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" id="save-client-btn">Créer la session</button>
+          <button type="reset" class="btn" id="cancel-edit" hidden>Annuler la modification</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel" id="clients-section">
+      <div class="panel-heading">
+        <div>
+          <h2>▤ Clients & sessions</h2>
+          <p>Les compteurs se mettent à jour automatiquement.</p>
+        </div>
+        <span class="pill" id="client-count">0 client</span>
+      </div>
+
+      <div class="toolbar">
+        <input class="search-input" id="search-client" placeholder="⌕ Rechercher un nom ou un numéro...">
+        <select class="search-input" id="filter-status" aria-label="Filtrer par statut">
+          <option value="all">Tous les statuts</option>
+          <option value="active">Actifs</option>
+          <option value="paused">En pause</option>
+          <option value="expired">Temps écoulé</option>
+          <option value="finished">Terminés</option>
+        </select>
+        <select class="search-input" id="filter-payment" aria-label="Filtrer par paiement">
+          <option value="all">Tous les paiements</option>
+          <option value="paid">Payés</option>
+          <option value="unpaid">Non payés</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>CLIENT</th>
+              <th>STATUT</th>
+              <th>TEMPS RESTANT</th>
+              <th>TARIF</th>
+              <th>PAIEMENT</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="clients-body"></tbody>
+        </table>
+      </div>
+      <div class="empty hidden" id="empty-clients">
+        <div>◌</div>
+        Aucun client trouvé. Ajoute un client ou modifie tes filtres.
+      </div>
+    </section>
+
+    <div class="bottom-grid">
+      <section class="panel" id="finance-section">
+        <div class="panel-heading">
+          <div><h2>＄ Résumé financier</h2><p>Montants en gourdes haïtiennes (HTG).</p></div>
+        </div>
+        <div class="metric-row"><span>Revenus encaissés</span><strong id="finance-paid">0 HTG</strong></div>
+        <div class="metric-row"><span>Montants à recouvrer</span><strong id="finance-unpaid">0 HTG</strong></div>
+        <div class="metric-row"><span>Sessions créées</span><strong id="finance-total">0</strong></div>
+        <div class="metric-row"><span>Sessions terminées</span><strong id="finance-finished">0</strong></div>
+        <div class="metric-row"><span>Montant total enregistré</span><strong id="finance-all">0 HTG</strong></div>
+      </section>
+
+      <section class="panel" id="history-section">
+        <div class="panel-heading">
+          <div><h2>◷ Activité récente</h2><p>Les événements importants de tes sessions.</p></div>
+          <button class="btn btn-small" id="clear-history">Effacer</button>
+        </div>
+        <div class="alert-list" id="history-list"></div>
+      </section>
+    </div>
+
+    <section class="panel" id="backup-section">
+      <div class="panel-heading">
+        <div><h2>⚙ Données & outils</h2><p>Exporte tes informations et protège tes données.</p></div>
+      </div>
+      <p style="color:var(--muted);font-size:13px;line-height:1.8">
+        Les informations sont conservées dans le stockage local de ce navigateur.
+        Télécharge régulièrement une sauvegarde, surtout avant de changer d'ordinateur ou de navigateur.
+      </p>
+      <div class="form-actions">
+        <button class="btn btn-primary" id="export-csv">⇩ Exporter les clients (CSV)</button>
+        <button class="btn" id="export-json">⇩ Sauvegarde complète (JSON)</button>
+        <button class="btn" id="import-json">⇧ Restaurer une sauvegarde</button>
+        <button class="btn" id="enable-notifications">🔔 Autoriser les notifications</button>
+        <input type="file" id="import-file" accept=".json,application/json" class="hidden">
+      </div>
+      <p style="color:var(--muted);font-size:11px;line-height:1.8;margin-top:18px">
+        Important : ce tableau de bord gère les sessions et les alertes, mais ne coupe pas automatiquement
+        Internet sur le routeur. Pour cela, il faudra une intégration compatible avec ton routeur ou ton système hotspot.
+      </p>
+    </section>
+
+    <footer>RICKRA1N TECH © <span id="year"></span> · SMART NETWORK MANAGEMENT</footer>
+  </main>
+</div>
+
+<div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+<dialog id="action-dialog">
+  <h2 id="dialog-title">Confirmer l'action</h2>
+  <p id="dialog-message"></p>
+  <div class="form-actions">
+    <button class="btn btn-primary" id="dialog-confirm">Confirmer</button>
+    <button class="btn" id="dialog-cancel">Annuler</button>
+  </div>
+</dialog>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+const STORAGE_KEY = "rickra1n_wifi_control_v2";
+
+let clients = [];
+let historyItems = [];
+let editingId = null;
+let soundEnabled = true;
+let dialogCallback = null;
+let audioContext = null;
+
+function makeId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
+}
+
+function safeText(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;",
+    '"': "&quot;", "'": "&#39;"
+  })[ch]);
+}
+
+function money(amount) {
+  return new Intl.NumberFormat("fr-FR", {
+    maximumFractionDigits: 2
+  }).format(Number(amount) || 0) + " HTG";
+}
+
+function formatDuration(seconds) {
+  seconds = Math.max(0, Math.floor(seconds));
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  if (h > 0) return `${h} h ${String(m).padStart(2,"0")} min`;
+  if (m > 0) return `${m} min ${String(s).padStart(2,"0")} s`;
+  return `${s} s`;
+}
+
+function durationLabel(minutes) {
+  if (minutes >= 1440 && minutes % 1440 === 0) return (minutes / 1440) + " jour(s)";
+  if (minutes >= 60 && minutes % 60 === 0) return (minutes / 60) + " heure(s)";
+  return minutes + " min";
+}
+
+function statusOf(client) {
+  if (client.status === "finished") return "finished";
+  if (client.status === "paused") return "paused";
+  if (client.status === "expired" || (client.status === "active" && client.endAt <= Date.now())) return "expired";
+  return "active";
+}
+
+function remainingSeconds(client) {
+  if (client.status === "paused") return Math.max(0, Math.ceil((client.remainingMs || 0) / 1000));
+  if (statusOf(client) === "expired" || client.status === "finished") return 0;
+  return Math.max(0, Math.ceil((client.endAt - Date.now()) / 1000));
+}
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    clients = Array.isArray(data.clients) ? data.clients : [];
+    historyItems = Array.isArray(data.history) ? data.history : [];
+    clients = clients.filter(c => c && c.id && typeof c.name === "string");
+    historyItems = historyItems.slice(0,100);
+  } catch (error) {
+    console.error("Erreur de lecture des données", error);
+    showToast("Impossible de lire les données sauvegardées.", "error");
+  }
+}
+
+function saveData() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      clients, history: historyItems
+    }));
+  } catch (error) {
+    console.error(error);
+    showToast("Sauvegarde impossible. Exporte tes données.", "error");
+  }
+}
+
+function addHistory(message, icon = "◈") {
+  historyItems.unshift({ id: makeId(), message, icon, at: Date.now() });
+  historyItems = historyItems.slice(0,100);
+  saveData();
+  renderHistory();
+}
+
+function showToast(message, type = "") {
+  const toast = document.createElement("div");
+  toast.className = "toast " + type;
+  toast.textContent = message;
+  $("toast-container").appendChild(toast);
+  setTimeout(() => toast.remove(), 4500);
+}
+
+function confirmAction(title, message, callback) {
+  $("dialog-title").textContent = title;
+  $("dialog-message").textContent = message;
+  dialogCallback = callback;
+  $("action-dialog").showModal();
+}
+
+$("dialog-cancel").addEventListener("click", () => {
+  dialogCallback = null;
+  $("action-dialog").close();
+});
+
+$("dialog-confirm").addEventListener("click", () => {
+  const callback = dialogCallback;
+  dialogCallback = null;
+  $("action-dialog").close();
+  if (callback) callback();
+});
+
+function beep() {
+  if (!soundEnabled) return;
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    audioContext = audioContext || new AudioCtx();
+    if (audioContext.state === "suspended") audioContext.resume();
+    [0, .25, .5].forEach((delay, index) => {
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      oscillator.type = "sine";
+      oscillator.frequency.value = index === 1 ? 880 : 660;
+      gain.gain.setValueAtTime(.0001, audioContext.currentTime + delay);
+      gain.gain.exponentialRampToValueAtTime(.18, audioContext.currentTime + delay + .025);
+      gain.gain.exponentialRampToValueAtTime(.0001, audioContext.currentTime + delay + .18);
+      oscillator.connect(gain);
+      gain.connect(audioContext.destination);
+      oscillator.start(audioContext.currentTime + delay);
+      oscillator.stop(audioContext.currentTime + delay + .2);
+    });
+  } catch (error) {
+    console.warn("Son indisponible", error);
+  }
+}
+
+function notify(title, body) {
+  showToast(title + " — " + body, "warning");
+  beep();
+  if ("Notification" in window && Notification.permission === "granted") {
+    try {
+      new Notification(title, { body, tag: title + body });
+    } catch (error) {
+      console.warn("Notification indisponible", error);
+    }
+  }
+}
+
+function processTimers() {
+  const now = Date.now();
+  let changed = false;
+
+  for (const client of clients) {
+    if (client.status !== "active") continue;
+
+    const seconds = Math.ceil((client.endAt - now) / 1000);
+
+    if (seconds <= 0) {
+      client.status = "expired";
+      client.expiredAt = now;
+      client.remainingMs = 0;
+      changed = true;
+      notify("⏰ Temps écoulé", "La session de " + client.name + " est terminée.");
+      addHistory("Temps écoulé : " + client.name, "⏰");
+      continue;
+    }
+
+    if (seconds <= 300 && !client.alert5) {
+      client.alert5 = true;
+      changed = true;
+      notify("⌛ 5 minutes restantes", client.name + " : il reste moins de 5 minutes.");
+      addHistory("Alerte : 5 minutes restantes pour " + client.name, "⌛");
+    } else if (seconds <= 60 && !client.alert1) {
+      client.alert1 = true;
+      changed = true;
+      notify("⚠ 1 minute restante", client.name + " : il reste moins d'une minute.");
+      addHistory("Alerte : 1 minute restante pour " + client.name, "⚠");
+    }
+  }
+
+  if (changed) saveData();
+  renderStats();
+  renderClients();
+}
+
+function renderStats() {
+  const active = clients.filter(c => statusOf(c) === "active");
+  const seconds = active.reduce((sum,c) => sum + remainingSeconds(c), 0);
+  const paid = clients.filter(c => c.payment === "paid").reduce((sum,c) => sum + Number(c.price || 0), 0);
+  const unpaid = clients.filter(c => c.payment !== "paid").reduce((sum,c) => sum + Number(c.price || 0), 0);
+  const all = clients.reduce((sum,c) => sum + Number(c.price || 0), 0);
+
+  $("stat-active").textContent = active.length;
+  $("stat-time").textContent = seconds >= 3600
+    ? Math.floor(seconds / 3600) + " h " + Math.floor((seconds % 3600) / 60) + " min"
+    : Math.floor(seconds / 60) + " min";
+  $("stat-revenue").textContent = money(paid);
+  $("stat-unpaid").textContent = money(unpaid);
+
+  $("finance-paid").textContent = money(paid);
+  $("finance-unpaid").textContent = money(unpaid);
+  $("finance-total").textContent = clients.length;
+  $("finance-finished").textContent = clients.filter(c =>
+    ["finished","expired"].includes(statusOf(c))
+  ).length;
+  $("finance-all").textContent = money(all);
+  $("client-count").textContent = clients.length + (clients.length === 1 ? " client" : " clients");
+}
+
+function statusMarkup(status) {
+  const labels = {
+    active: ["status-active","● Actif"],
+    paused: ["status-paused","Ⅱ En pause"],
+    expired: ["status-expired","! Temps écoulé"],
+    finished: ["status-finished","✓ Terminé"]
+  };
+  const item = labels[status] || labels.finished;
+  return `<span class="status ${item[0]}">${item[1]}</span>`;
+}
+
+function renderClients() {
+  const search = $("search-client").value.trim().toLowerCase();
+  const filterStatus = $("filter-status").value;
+  const filterPayment = $("filter-payment").value;
+
+  const visible = clients.filter(c => {
+    const status = statusOf(c);
+    const haystack = [c.name,c.contact,c.notes].join(" ").toLowerCase();
+    return (!search || haystack.includes(search))
+      && (filterStatus === "all" || status === filterStatus)
+      && (filterPayment === "all" || (c.payment || "unpaid") === filterPayment);
+  }).sort((a,b) => {
+    const order = { active:0, paused:1, expired:2, finished:3 };
+    return order[statusOf(a)] - order[statusOf(b)] || (a.createdAt || 0) - (b.createdAt || 0);
+  });
+
+  $("clients-body").innerHTML = visible.map(c => {
+    const status = statusOf(c);
+    const seconds = remainingSeconds(c);
+    const progress = Math.min(100, Math.max(0,
+      c.durationMs ? seconds * 1000 / c.durationMs * 100 : 0
+    ));
+    const timerClass = status === "expired" ? "expired" : seconds <= 300 ? "warning" : "";
+    const payment = c.payment === "paid"
+      ? '<span class="pill paid">✓ Payé</span>'
+      : '<span class="pill unpaid">⌛ Non payé</span>';
+
+    let actions = "";
+    if (status === "active") {
+      actions += `<button class="action" data-action="pause" data-id="${safeText(c.id)}">Ⅱ Pause</button>`;
+    } else if (status === "paused") {
+      actions += `<button class="action" data-action="resume" data-id="${safeText(c.id)}">▶ Reprendre</button>`;
+    } else {
+      actions += `<button class="action" data-action="restart" data-id="${safeText(c.id)}">↻ Relancer</button>`;
+    }
+
+    actions += `<button class="action" data-action="extend" data-id="${safeText(c.id)}">＋ Temps</button>`;
+    actions += `<button class="action" data-action="payment" data-id="${safeText(c.id)}">${c.payment === "paid" ? "Annuler paiement" : "Marquer payé"}</button>`;
+    actions += `<button class="action" data-action="edit" data-id="${safeText(c.id)}">✎ Modifier</button>`;
+    if (status === "active" || status === "paused") {
+      actions += `<button class="action" data-action="finish" data-id="${safeText(c.id)}">✓ Terminer</button>`;
+    }
+    actions += `<button class="action delete" data-action="delete" data-id="${safeText(c.id)}">✕</button>`;
+
+    return `<tr>
+      <td>
+        <div class="client-name">${safeText(c.name)}</div>
+        <div class="client-meta">${safeText(c.contact || "Aucun contact")}</div>
+        ${c.notes ? `<div class="client-meta">${safeText(c.notes)}</div>` : ""}
+      </td>
+      <td>${statusMarkup(status)}</td>
+      <td>
+        <div class="timer ${timerClass}">${status === "finished" ? "Terminé" : formatDuration(seconds)}</div>
+        <div class="mini-progress"><span style="width:${progress}%;background:${status === "expired" ? "var(--red)" : status === "paused" ? "var(--yellow)" : "var(--green)"}"></span></div>
+        <div class="client-meta">Durée : ${durationLabel(c.durationMinutes || 0)}</div>
+      </td>
+      <td><strong>${money(c.price)}</strong></td>
+      <td>${payment}</td>
+      <td><div class="actions">${actions}</div></td>
+    </tr>`;
+  }).join("");
+
+  $("empty-clients").classList.toggle("hidden", visible.length > 0);
+  $("clients-body").parentElement.classList.toggle("hidden", visible.length === 0);
+}
+
+function renderHistory() {
+  const items = historyItems.slice(0,8);
+  $("history-list").innerHTML = items.length ? items.map(item => `
+    <div class="alert-item">
+      <div>${safeText(item.icon || "◈")}</div>
+      <div style="min-width:0;overflow-wrap:anywhere">
+        ${safeText(item.message)}
+        <small>${new Date(item.at).toLocaleString("fr-FR")}</small>
+      </div>
+    </div>
+  `).join("") : '<div class="empty">Aucune activité enregistrée.</div>';
+}
+
+function renderAll() {
+  renderStats();
+  renderClients();
+  renderHistory();
+}
+
+function getDurationMinutes() {
+  if ($("client-duration").value === "custom") {
+    const n = Number($("custom-duration").value);
+    if (!Number.isFinite(n) || n < 1 || n > 525600) return null;
+    return Math.floor(n);
+  }
+  return Number($("client-duration").value);
+}
+
+$("client-duration").addEventListener("change", () => {
+  $("custom-duration-field").classList.toggle("hidden", $("client-duration").value !== "custom");
+  $("custom-duration").required = $("client-duration").value === "custom";
+});
+
+$("client-form").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const name = $("client-name").value.trim();
+  const contact = $("client-contact").value.trim();
+  const notes = $("client-notes").value.trim();
+  const durationMinutes = getDurationMinutes();
+  const price = Number($("client-price").value || 0);
+
+  if (!name) return showToast("Entre le nom du client.", "error");
+  if (!durationMinutes || durationMinutes < 1) return showToast("Entre une durée valide.", "error");
+  if (!Number.isFinite(price) || price < 0) return showToast("Entre un prix valide.", "error");
+
+  const payment = $("client-payment").value;
+  const shouldPause = $("client-start").value === "paused";
+  const now = Date.now();
+
+  if (editingId) {
+    const client = clients.find(c => c.id === editingId);
+    if (!client) return resetForm();
+
+    const oldStatus = statusOf(client);
+    const oldRemaining = remainingSeconds(client);
+
+    client.name = name;
+    client.contact = contact;
+    client.notes = notes;
+    client.price = price;
+    client.payment = payment;
+
+    const newDurationMs = durationMinutes * 60000;
+    if (oldStatus === "paused") {
+      client.remainingMs = newDurationMs;
+      client.status = shouldPause ? "paused" : "active";
+      client.endAt = now + newDurationMs;
+    } else {
+      client.status = shouldPause ? "paused" : "active";
+      client.remainingMs = newDurationMs;
+      client.endAt = now + newDurationMs;
+    }
+
+    client.durationMinutes = durationMinutes;
+    client.durationMs = newDurationMs;
+    client.alert5 = false;
+    client.alert1 = false;
+    client.expiredAt = null;
+    client.startedAt = now;
+    addHistory("Session modifiée : " + name, "✎");
+    showToast("Client modifié avec succès.");
+  } else {
+    const durationMs = durationMinutes * 60000;
+    const client = {
+      id: makeId(), name, contact, notes, price, payment,
+      durationMinutes, durationMs,
+      status: shouldPause ? "paused" : "active",
+      remainingMs: shouldPause ? durationMs : 0,
+      endAt: now + durationMs,
+      createdAt: now,
+      startedAt: shouldPause ? null : now,
+      alert5: false, alert1: false, expiredAt: null
+    };
+    clients.push(client);
+    addHistory("Nouveau client : " + name + " (" + durationLabel(durationMinutes) + ")", "＋");
+    showToast("Session créée pour " + name + ".");
+  }
+
+  saveData();
+  resetForm();
+  renderAll();
+});
+
+function resetForm() {
+  editingId = null;
+  $("client-form").reset();
+  $("client-duration").value = "60";
+  $("client-price").value = "0";
+  $("client-payment").value = "paid";
+  $("client-start").value = "now";
+  $("custom-duration-field").classList.add("hidden");
+  $("custom-duration").required = false;
+  $("form-title").textContent = "＋ Ajouter un client";
+  $("save-client-btn").textContent = "Créer la session";
+  $("cancel-edit").hidden = true;
+}
+
+$("cancel-edit").addEventListener("click", () => {
+  resetForm();
+  showToast("Modification annulée.");
+});
+
+function findClient(id) {
+  return clients.find(c => c.id === id);
+}
+
+$("clients-body").addEventListener("click", event => {
+  const button = event.target.closest("button[data-action]");
+  if (!button) return;
+
+  const client = findClient(button.dataset.id);
+  if (!client) return;
+
+  const action = button.dataset.action;
+  const status = statusOf(client);
+  const now = Date.now();
+
+  if (action === "pause") {
+    client.remainingMs = Math.max(0, client.endAt - now);
+    client.status = "paused";
+    saveData();
+    addHistory("Session mise en pause : " + client.name, "Ⅱ");
+    showToast("Session mise en pause.");
+  }
+
+  if (action === "resume") {
+    if ((client.remainingMs || 0) <= 0) {
+      client.status = "expired";
+      saveData();
+      renderAll();
+      return showToast("Le temps est écoulé. Relance la session.", "warning");
+    }
+    client.endAt = now + client.remainingMs;
+    client.status = "active";
+    client.startedAt = now;
+    saveData();
+    addHistory("Session reprise : " + client.name, "▶");
+    showToast("Session reprise.");
+  }
+
+  if (action === "extend") {
+    const input = prompt("Combien de minutes veux-tu ajouter à " + client.name + " ?", "30");
+    if (input === null) return;
+    const minutes = Number(input);
+    if (!Number.isFinite(minutes) || minutes <= 0 || minutes > 525600) {
+      return showToast("Entre un nombre de minutes valide.", "error");
+    }
+    const extraMs = Math.floor(minutes) * 60000;
+
+    if (client.status === "paused") {
+      client.remainingMs = (client.remainingMs || 0) + extraMs;
+    } else {
+      const base = Math.max(now, client.endAt || now);
+      client.endAt = base + extraMs;
+      if (client.status === "expired" || client.status === "finished") {
+        client.status = "active";
+      }
+    }
+
+    client.durationMs = (client.durationMs || 0) + extraMs;
+    client.durationMinutes = (client.durationMinutes || 0) + Math.floor(minutes);
+    client.alert5 = false;
+    client.alert1 = false;
+    client.expiredAt = null;
+    saveData();
+    addHistory("Temps ajouté (" + minutes + " min) : " + client.name, "＋");
+    showToast("Temps ajouté avec succès.");
+  }
+
+  if (action === "restart") {
+    confirmAction("Relancer la session", "Relancer " + client.name + " avec sa durée initiale de " + durationLabel(client.durationMinutes) + " ?", () => {
+      const ms = client.durationMinutes * 60000;
+      client.durationMs = ms;
+      client.endAt = Date.now() + ms;
+      client.remainingMs = 0;
+      client.status = "active";
+      client.startedAt = Date.now();
+      client.expiredAt = null;
+      client.alert5 = false;
+      client.alert1 = false;
+      saveData();
+      addHistory("Session relancée : " + client.name, "↻");
+      renderAll();
+      showToast("Session relancée.");
+    });
+    return;
+  }
+
+  if (action === "payment") {
+    client.payment = client.payment === "paid" ? "unpaid" : "paid";
+    saveData();
+    addHistory((client.payment === "paid" ? "Paiement reçu : " : "Paiement remis en attente : ") + client.name, "＄");
+    showToast(client.payment === "paid" ? "Paiement marqué comme reçu." : "Paiement marqué comme non payé.");
+  }
+
+  if (action === "finish") {
+    confirmAction("Terminer la session", "Terminer la session de " + client.name + " ?", () => {
+      client.status = "finished";
+      client.remainingMs = 0;
+      client.finishedAt = Date.now();
+      saveData();
+      addHistory("Session terminée manuellement : " + client.name, "✓");
+      renderAll();
+      showToast("Session terminée.");
+    });
+    return;
+  }
+
+  if (action === "delete") {
+    confirmAction("Supprimer le client", "Supprimer définitivement " + client.name + " de cette liste ? Cette action ne peut pas être annulée.", () => {
+      clients = clients.filter(c => c.id !== client.id);
+      saveData();
+      addHistory("Client supprimé : " + client.name, "✕");
+      renderAll();
+      showToast("Client supprimé.");
+    });
+    return;
+  }
+
+  if (action === "edit") {
+    editingId = client.id;
+    $("client-name").value = client.name;
+    $("client-contact").value = client.contact || "";
+    $("client-notes").value = client.notes || "";
+    $("client-price").value = client.price || 0;
+    $("client-payment").value = client.payment || "unpaid";
+    $("client-duration").value = "custom";
+    $("custom-duration").value = client.durationMinutes || 60;
+    $("custom-duration-field").classList.remove("hidden");
+    $("custom-duration").required = true;
+    $("client-start").value = status === "paused" ? "paused" : "now";
+    $("form-title").textContent = "✎ Modifier un client";
+    $("save-client-btn").textContent = "Enregistrer les modifications";
+    $("cancel-edit").hidden = false;
+    $("add-section").scrollIntoView({ behavior:"smooth", block:"start" });
+    return;
+  }
+
+  renderAll();
+});
+
+$("search-client").addEventListener("input", renderClients);
+$("filter-status").addEventListener("change", renderClients);
+$("filter-payment").addEventListener("change", renderClients);
+
+document.querySelectorAll(".nav-btn").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+    button.classList.add("active");
+    const target = $(button.dataset.target);
+    if (target) target.scrollIntoView({ behavior:"smooth", block:"start" });
+  });
+});
+
+$("jump-add").addEventListener("click", () => {
+  $("add-section").scrollIntoView({ behavior:"smooth", block:"start" });
+  $("client-name").focus({ preventScroll:true });
+});
+
+$("sound-toggle").addEventListener("click", () => {
+  soundEnabled = !soundEnabled;
+  $("sound-toggle").textContent = soundEnabled ? "🔔 Son activé" : "🔕 Son désactivé";
+  if (soundEnabled) beep();
+});
+
+$("enable-notifications").addEventListener("click", async () => {
+  if (!("Notification" in window)) {
+    return showToast("Les notifications ne sont pas prises en charge par ce navigateur.", "error");
+  }
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission === "granted") showToast("Notifications autorisées.");
+    else showToast("Notifications non autorisées. Les alertes internes restent disponibles.", "warning");
+  } catch {
+    showToast("Impossible d'activer les notifications.", "error");
+  }
+});
+
+function downloadFile(filename, content, type) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function csvCell(value) {
+  return '"' + String(value ?? "").replace(/"/g,'""') + '"';
+}
+
+$("export-csv").addEventListener("click", () => {
+  const headers = ["Nom","Contact","Notes","Statut","Durée (minutes)","Temps restant (secondes)","Prix HTG","Paiement","Création"];
+  const rows = clients.map(c => [
+    c.name, c.contact, c.notes, statusOf(c), c.durationMinutes,
+    remainingSeconds(c), c.price, c.payment,
+    c.createdAt ? new Date(c.createdAt).toLocaleString("fr-FR") : ""
+  ]);
+  const csv = "\uFEFF" + [headers,...rows].map(row => row.map(csvCell).join(";")).join("\r\n");
+  downloadFile("rickra1n-clients.csv", csv, "text/csv;charset=utf-8");
+  showToast("Export CSV téléchargé.");
+});
+
+$("export-json").addEventListener("click", () => {
+  const content = JSON.stringify({ version:2, exportedAt:new Date().toISOString(), clients, history:historyItems }, null, 2);
+  downloadFile("rickra1n-backup.json", content, "application/json");
+  showToast("Sauvegarde téléchargée.");
+});
+
+$("import-json").addEventListener("click", () => $("import-file").click());
+
+$("import-file").addEventListener("change", async event => {
+  const file = event.target.files[0];
+  if (!file) return;
+  try {
+    const data = JSON.parse(await file.text());
+    if (!data || !Array.isArray(data.clients)) throw new Error("Format invalide");
+    confirmAction("Restaurer une sauvegarde", "Cette opération remplacera les clients et l'historique actuels. Exporte d'abord tes données actuelles si tu veux les conserver.", () => {
+      clients = data.clients.filter(c => c && c.id && typeof c.name === "string");
+      historyItems = Array.isArray(data.history) ? data.history.slice(0,100) : [];
+      saveData();
+      renderAll();
+      showToast("Sauvegarde restaurée.");
+    });
+  } catch {
+    showToast("Fichier de sauvegarde invalide.", "error");
+  }
+  event.target.value = "";
+});
+
+$("clear-history").addEventListener("click", () => {
+  confirmAction("Effacer l'historique", "Effacer les événements récents ? Les clients ne seront pas supprimés.", () => {
+    historyItems = [];
+    saveData();
+    renderHistory();
+    showToast("Historique effacé.");
+  });
+});
+
+function updateClock() {
+  const now = new Date();
+  $("live-clock").textContent = now.toLocaleTimeString("fr-FR", { hour12:false });
+  $("live-date").textContent = now.toLocaleDateString("fr-FR", {
+    weekday:"long", day:"numeric", month:"long", year:"numeric"
+  });
+}
+
+$("year").textContent = new Date().getFullYear();
+
+loadData();
+updateClock();
+renderAll();
+
+// Vérifie les sessions au chargement, puis chaque seconde.
+processTimers();
+setInterval(updateClock, 1000);
+setInterval(processTimers, 1000);
+
+// Si l'utilisateur revient sur la page après l'avoir laissée ouverte,
+// les sessions actives sont recalculées à partir de leur heure de fin.
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) processTimers();
+});
+
+</script>
+</body>
+</html>
